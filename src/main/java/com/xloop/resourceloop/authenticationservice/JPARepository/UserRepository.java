@@ -6,4 +6,5 @@ import com.xloop.resourceloop.authenticationservice.Model.User;
 
 public interface UserRepository extends JpaRepository<User,Long> {
     
+    public User findByEmail(String email);
 }
