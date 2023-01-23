@@ -2,6 +2,7 @@ package com.xloop.resourceloop.authenticationservice.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,5 +25,11 @@ public class AuthController {
         }
         userRepo.save(user);
         return ResponseEntity.ok("User Registered");
+    }
+    @PostMapping("/forgetpassword/{id}")
+    public void resetPassword(@PathVariable Long id ,@RequestBody String new_password){
+        User user = userRepo.findById(id).orElse(null);
+        user.setPassword(new_password);
+        userRepo.save(user);
     } 
 }
