@@ -20,23 +20,28 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody User user){
-        User exist_user = userRepo.findByEmail(user.getEmail());
-        if(exist_user != null){
-            return ResponseEntity.status(208).body("User Already Exist");
+        User userExists = userRepo.findByEmail(user.getEmail());
+        if(userExists != null){
+            return ResponseEntity.status(409).body("User Already Exist");
         }
         userRepo.save(user);
         return ResponseEntity.ok("User Registered");
     }
 
     @PostMapping("/login")
-    public User login(@RequestBody Auth auth){
+    public ResponseEntity<User> login(@RequestBody Auth auth){
         User user = userRepo.findByEmailAndPassword(auth.getEmail(), auth.getPassword());
-        return user;
+        if(user == null){
+            return ResponseEntity.status(404).body(null);
+        }
+        return ResponseEntity.status(200).body(user);
     }
+
     @PostMapping("/forgetpassword/{id}")
-    public void resetPassword(@PathVariable Long id ,@RequestBody String new_password){
+    public ResponseEntity<String> resetPassword(@PathVariable Long id ,@RequestBody String new_password){
         User user = userRepo.findById(id).orElse(null);
         user.setPassword(new_password);
         userRepo.save(user);
+        return ResponseEntity.status(200).body("Password Updated Successfully");
     } 
 }
