@@ -20,12 +20,18 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody User user){
-        User userExists = userRepo.findByEmail(user.getEmail());
-        if(userExists != null){
-            return ResponseEntity.status(409).body("User Already Exist");
+        if(user.getFirst_name() != null && user.getEmail() != null && user.getPassword() != null){
+            User userExists = userRepo.findByEmail(user.getEmail());
+            if(userExists != null){
+                return ResponseEntity.status(409).body("User Already Exist");
+            }
+            userRepo.save(user);
+            return ResponseEntity.ok("User Registered");
         }
-        userRepo.save(user);
-        return ResponseEntity.ok("User Registered");
+        else{
+            return ResponseEntity.status(400).body("All feilds Required");
+        }
+        
     }
 
     @PostMapping("/login")
