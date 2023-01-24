@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.xloop.resourceloop.authenticationservice.Classes.Auth;
 import com.xloop.resourceloop.authenticationservice.JPARepository.UserRepository;
 import com.xloop.resourceloop.authenticationservice.Model.User;
 
@@ -25,6 +26,12 @@ public class AuthController {
         }
         userRepo.save(user);
         return ResponseEntity.ok("User Registered");
+    }
+
+    @PostMapping("/login")
+    public User login(@RequestBody Auth auth){
+        User user = userRepo.findByEmailAndPassword(auth.getEmail(), auth.getPassword());
+        return user;
     }
     @PostMapping("/forgetpassword/{id}")
     public void resetPassword(@PathVariable Long id ,@RequestBody String new_password){
