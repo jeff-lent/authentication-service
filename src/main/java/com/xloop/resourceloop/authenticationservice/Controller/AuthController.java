@@ -33,7 +33,6 @@ public class AuthController {
         else{
             return ResponseEntity.status(400).body("All feilds Required");
         }
-        
     }
 
     @PostMapping("/login")
