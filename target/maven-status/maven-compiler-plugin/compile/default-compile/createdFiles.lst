@@ -1,0 +1,8 @@
+com/xloop/resourceloop/authenticationservice/Model/User.class
+com/xloop/resourceloop/authenticationservice/AuthenticationServiceApplication.class
+com/xloop/resourceloop/authenticationservice/Controller/AuthController.class
+com/xloop/resourceloop/authenticationservice/Model/Role.class
+com/xloop/resourceloop/authenticationservice/JPARepository/UserRepository.class
+com/xloop/resourceloop/authenticationservice/Classes/Auth.class
+com/xloop/resourceloop/authenticationservice/Controller/RoleController.class
+com/xloop/resourceloop/authenticationservice/JPARepository/RoleRepository.class
