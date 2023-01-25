@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.xloop.resourceloop.authenticationservice.Classes.Auth;
 import com.xloop.resourceloop.authenticationservice.Controller.AuthController;
 import com.xloop.resourceloop.authenticationservice.JPARepository.UserRepository;
 import com.xloop.resourceloop.authenticationservice.Model.User;
@@ -36,6 +37,7 @@ class AuthenticationServiceApplicationTests {
 	private MockMvc mvc;
 
 	private JacksonTester<User> jsonUser;
+	private JacksonTester<Auth> jsonAuth;
 
 	@BeforeEach
 	public void setUp(){
@@ -72,9 +74,39 @@ class AuthenticationServiceApplicationTests {
 			.content(jsonUser.write(user).getJson()))
 			.andExpect(status().isConflict())
 			.andExpect(content().string("User Already Exist"));
-	} 
-
-
+	}
 	
+	@Test
+	public void canLoginSuccessfully() throws Exception{
+		User user = new User("Hunain","Parekh","hunain@hunain.com","Hunain123@");
+		Auth auth = new Auth("hunain@hunain.com","Hunain123@");
+		when(userRepo.findByEmailAndPassword(auth.getEmail(),auth.getPassword())).thenReturn(user);
+		mvc.perform(post("/auth/login")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(jsonAuth.write(auth).getJson()))
+			.andExpect(status().isOk())
+			.andExpect(content().json(jsonUser.write(user).getJson()));
+	}
+	
+	@Test 
+	public void canNotLoginSuccessfullyDueToIncorrectPassword() throws Exception{
+	User user = new User("Hunain","Parekh","hunain@hunain.com","Hunain123@");
+	Auth auth = new Auth("hunain@hunain.com","commander_in_chief@123");
+	when(userRepo.findByEmailAndPassword(auth.getEmail(), auth.getPassword())).thenReturn(null);
+	mvc.perform(post("/auth/login")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(jsonAuth.write(auth).getJson()))
+			.andExpect(status().isNotFound());
+	}
 
+	@Test 
+	public void canNotLoginSuccessfullyDueToIncorrectEmail() throws Exception{
+	User user = new User("Hunain","Parekh","hunain@hunain.com","Hunain123@");
+	Auth auth = new Auth("hunain@hunain.com.pk","Hunain123@");
+	when(userRepo.findByEmailAndPassword(auth.getEmail(), auth.getPassword())).thenReturn(null);
+	mvc.perform(post("/auth/login")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(jsonAuth.write(auth).getJson()))
+			.andExpect(status().isNotFound());
+	}
 }
