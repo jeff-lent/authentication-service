@@ -53,7 +53,7 @@ public class AuthController {
                 return ResponseEntity.status(200).body(user);
             }
         }
-        return ResponseEntity.status(404).body(null);
+        return ResponseEntity.status(403).body(null);
     }
 
     @PostMapping("/forgetpassword/{id}")
