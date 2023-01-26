@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.xloop.resourceloop.authenticationservice.Classes.Auth;
 import com.xloop.resourceloop.authenticationservice.JPARepository.UserRepository;
 import com.xloop.resourceloop.authenticationservice.Model.User;
+import com.xloop.resourceloop.authenticationservice.mail.EmailService;
 
 @RestController
 @RequestMapping("/auth")
@@ -22,6 +23,9 @@ import com.xloop.resourceloop.authenticationservice.Model.User;
 public class AuthController {
     @Autowired
     private UserRepository userRepo;
+
+    @Autowired
+    private EmailService emailService;
 
     BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(10, new SecureRandom());
 
@@ -62,5 +66,11 @@ public class AuthController {
         user.setPassword(new_password);
         userRepo.save(user);
         return ResponseEntity.status(200).body("Password Updated Successfully");
-    } 
+    }
+    
+    @PostMapping("/forgetpassword-link")
+    public ResponseEntity<String> resetPasswordLink(@RequestBody String email){
+        emailService.sendSimpleMessage(email, "My Subject", "Test Email Send From Spring Boot");
+        return ResponseEntity.status(200).body("Reset Password Link Send Successfully");
+    }
 }
