@@ -1,7 +1,10 @@
 package com.xloop.resourceloop.authenticationservice.Controller;
 
+import java.security.SecureRandom;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +23,8 @@ public class AuthController {
     @Autowired
     private UserRepository userRepo;
 
+    BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(10, new SecureRandom());
+
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody User user){
         if(user.getFirst_name() != null && user.getEmail() != null && user.getPassword() != null){
@@ -27,6 +32,8 @@ public class AuthController {
             if(userExists != null){
                 return ResponseEntity.status(409).body("User Already Exist");
             }
+            String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
+            user.setPassword(encodedPassword);
             userRepo.save(user);
             return ResponseEntity.ok("User Registered");
         }
@@ -37,11 +44,16 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<User> login(@RequestBody Auth auth){
-        User user = userRepo.findByEmailAndPassword(auth.getEmail(), auth.getPassword());
+        User user = userRepo.findByEmail(auth.getEmail());
         if(user == null){
             return ResponseEntity.status(404).body(null);
         }
-        return ResponseEntity.status(200).body(user);
+        else{
+            if(bCryptPasswordEncoder.matches(auth.getPassword(),user.getPassword())){
+                return ResponseEntity.status(200).body(user);
+            }
+        }
+        return ResponseEntity.status(404).body(null);
     }
 
     @PostMapping("/forgetpassword/{id}")
