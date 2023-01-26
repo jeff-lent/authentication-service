@@ -50,7 +50,7 @@ public class AuthController {
     public ResponseEntity<User> login(@RequestBody Auth auth){
         User user = userRepo.findByEmail(auth.getEmail());
         if(user == null){
-            return ResponseEntity.status(404).body(null);
+            return ResponseEntity.status(403).body(null);
         }
         else{
             if(bCryptPasswordEncoder.matches(auth.getPassword(),user.getPassword())){

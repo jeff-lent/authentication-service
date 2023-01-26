@@ -81,9 +81,9 @@ class AuthenticationServiceApplicationTests {
 	
 	@Test
 	public void canLoginSuccessfully() throws Exception{
-		User user = new User("Hunain","Parekh","hunain@hunain.com","Hunain123@");
-		Auth auth = new Auth("hunain@hunain.com","Hunain123@");
-		when(userRepo.findByEmailAndPassword(auth.getEmail(),auth.getPassword())).thenReturn(user);
+		User user = new User("Hunain","Parekh","hunain@hunain.com","$2a$10$vxpnmgFHfyP5JgzZ6jPnYOJtmA1L5LO9LPbMeletOouwFo/b9WM1y");
+		Auth auth = new Auth("hunain@hunain.com","12345");
+		when(userRepo.findByEmail(auth.getEmail())).thenReturn(user);
 		mvc.perform(post("/auth/login")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(jsonAuth.write(auth).getJson()))
@@ -93,24 +93,24 @@ class AuthenticationServiceApplicationTests {
 	
 	@Test 
 	public void canNotLoginSuccessfullyDueToIncorrectPassword() throws Exception{
-	User user = new User("Hunain","Parekh","hunain@hunain.com","Hunain123@");
+	User user = new User("Hunain","Parekh","hunain@hunain.com","$2a$10$vxpnmgFHfyP5JgzZ6jPnYOJtmA1L5LO9LPbMeletOouwFo/b9WM1y");
 	Auth auth = new Auth("hunain@hunain.com","commander_in_chief@123");
-	when(userRepo.findByEmailAndPassword(auth.getEmail(), auth.getPassword())).thenReturn(null);
+	when(userRepo.findByEmail(auth.getEmail())).thenReturn(user);
 	mvc.perform(post("/auth/login")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(jsonAuth.write(auth).getJson()))
-			.andExpect(status().isNotFound());
+			.andExpect(status().isForbidden());
 	}
 
 	@Test 
 	public void canNotLoginSuccessfullyDueToIncorrectEmail() throws Exception{
-	User user = new User("Hunain","Parekh","hunain@hunain.com","Hunain123@");
-	Auth auth = new Auth("hunain@hunain.com.pk","Hunain123@");
-	when(userRepo.findByEmailAndPassword(auth.getEmail(), auth.getPassword())).thenReturn(null);
+	User user = new User("Hunain","Parekh","hunain@hunain.com","$2a$10$vxpnmgFHfyP5JgzZ6jPnYOJtmA1L5LO9LPbMeletOouwFo/b9WM1y");
+	Auth auth = new Auth("hunain@hunain.com.pk","12345");
+	when(userRepo.findByEmail(auth.getEmail())).thenReturn(null);
 	mvc.perform(post("/auth/login")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(jsonAuth.write(auth).getJson()))
-			.andExpect(status().isNotFound());
+			.andExpect(status().isForbidden());
 	}
 
 	@Test
