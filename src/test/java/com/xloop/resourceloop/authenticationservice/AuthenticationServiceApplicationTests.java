@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +22,9 @@ import com.xloop.resourceloop.authenticationservice.Model.User;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.Optional;
+
 import org.springframework.http.MediaType;
 
 @AutoConfigureJsonTesters
@@ -38,6 +42,7 @@ class AuthenticationServiceApplicationTests {
 
 	private JacksonTester<User> jsonUser;
 	private JacksonTester<Auth> jsonAuth;
+	private JacksonTester<String> jsonPassword;
 
 	@BeforeEach
 	public void setUp(){
@@ -109,4 +114,17 @@ class AuthenticationServiceApplicationTests {
 			.content(jsonAuth.write(auth).getJson()))
 			.andExpect(status().isNotFound());
 	}
+
+	@Test
+	public void passwordResetSuccessful() throws Exception{
+		String new_password = "Hunain12345#";
+		User user = new User("Hunain","Parekh","hunain@hunain.com","Hunain123@");
+		when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+		mvc.perform(post("/auth/forgetpassword/1")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(jsonPassword.write(new_password).getJson()))
+			.andExpect(status().isOk())
+			.andExpect(content().string("Password Updated Successfully"));
+	}
+
 }
