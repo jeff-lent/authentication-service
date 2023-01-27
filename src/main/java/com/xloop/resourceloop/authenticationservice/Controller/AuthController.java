@@ -16,6 +16,7 @@ import com.xloop.resourceloop.authenticationservice.Classes.Auth;
 import com.xloop.resourceloop.authenticationservice.JPARepository.UserRepository;
 import com.xloop.resourceloop.authenticationservice.Model.User;
 import com.xloop.resourceloop.authenticationservice.mail.EmailService;
+import com.xloop.resourceloop.authenticationservice.mail.EmailServiceImpl;
 
 @RestController
 @RequestMapping("/auth")
@@ -24,8 +25,11 @@ public class AuthController {
     @Autowired
     private UserRepository userRepo;
 
+    // @Autowired
+    // private EmailService emailService;
+
     @Autowired
-    private EmailService emailService;
+    private EmailServiceImpl senderService;
 
     BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(10, new SecureRandom());
 
@@ -70,7 +74,11 @@ public class AuthController {
     
     @PostMapping("/forgetpassword-link")
     public ResponseEntity<String> resetPasswordLink(@RequestBody String email){
-        emailService.sendSimpleMessage(email, "My Subject", "Test Email Send From Spring Boot");
-        return ResponseEntity.status(200).body("Reset Password Link Send Successfully");
+        User user = userRepo.findByEmail(email);
+        if(user == null){
+            return ResponseEntity.status(403).body("Email Not Found");
+        }
+        senderService.sendSimpleMessage(email, "Reset Password Email", "Hi, User....");
+        return ResponseEntity.status(200).body("Reset Pin Send Successfully");
     }
 }

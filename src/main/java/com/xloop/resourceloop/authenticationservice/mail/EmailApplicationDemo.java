@@ -8,6 +8,7 @@ import org.springframework.context.event.EventListener;
 
 @SpringBootApplication
 public class EmailApplicationDemo {
+    
     @Autowired
     private EmailServiceImpl senderService;
 
@@ -15,8 +16,8 @@ public class EmailApplicationDemo {
         SpringApplication.run(EmailApplicationDemo.class, args);
         
     }
-    @EventListener(ApplicationReadyEvent.class)
-    public void sendMail(){
-        senderService.sendSimpleMessage("yzai9071@gmail.com", "Demo Mail", "Hi, Hassan....");
-    }
+    // @EventListener(ApplicationReadyEvent.class)
+    // public void sendMail(){
+    //     senderService.sendSimpleMessage("hunain.parekh@xloopdigital.com", "Demo Mail", "Hi, Hassan....");
+    // }
 }
