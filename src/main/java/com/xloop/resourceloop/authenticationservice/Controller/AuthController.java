@@ -25,11 +25,9 @@ public class AuthController {
     @Autowired
     private UserRepository userRepo;
 
-    // @Autowired
-    // private EmailService emailService;
-
     @Autowired
-    private EmailServiceImpl senderService;
+    private EmailService emailService;
+
 
     BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(10, new SecureRandom());
 
@@ -78,7 +76,7 @@ public class AuthController {
         if(user == null){
             return ResponseEntity.status(403).body("Email Not Found");
         }
-        senderService.sendSimpleMessage(email, "Reset Password Email", "Hi, User....");
+        emailService.sendSimpleMessage(email, "Reset Password Email", "Hi, User....");
         return ResponseEntity.status(200).body("Reset Pin Send Successfully");
     }
 }
