@@ -6,6 +6,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.MailException;
 
+
 @Service("EmailService")
 public class EmailServiceImpl implements EmailService {
 
@@ -22,6 +23,7 @@ public class EmailServiceImpl implements EmailService {
           message.setSubject(subject);
           message.setText(text);
           emailSender.send(message);
+          System.out.println("Mail Sent Successfully!");
       } catch (MailException exception) {
           exception.printStackTrace();
       }
