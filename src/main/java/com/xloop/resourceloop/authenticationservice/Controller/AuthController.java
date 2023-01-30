@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.xloop.resourceloop.authenticationservice.Classes.Auth;
+import com.xloop.resourceloop.authenticationservice.Classes.OTPGeneration;
+import com.xloop.resourceloop.authenticationservice.JPARepository.ForgetPasswordRepository;
 import com.xloop.resourceloop.authenticationservice.JPARepository.UserRepository;
+import com.xloop.resourceloop.authenticationservice.Model.ForgetPassword;
 import com.xloop.resourceloop.authenticationservice.Model.User;
 import com.xloop.resourceloop.authenticationservice.mail.EmailService;
-import com.xloop.resourceloop.authenticationservice.mail.EmailServiceImpl;
 
 @RestController
 @RequestMapping("/auth")
@@ -27,6 +29,9 @@ public class AuthController {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private ForgetPasswordRepository forgetPasswordRepo;
 
 
     BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(10, new SecureRandom());
@@ -76,7 +81,20 @@ public class AuthController {
         if(user == null){
             return ResponseEntity.status(403).body("Email Not Found");
         }
-        emailService.sendSimpleMessage(email, "Reset Password Email", "Hi, User....");
+        String otp = OTPGeneration.OTP(4);
+        ForgetPassword forgetPassword = new ForgetPassword(email,otp);
+        forgetPasswordRepo.save(forgetPassword);
+        emailService.sendSimpleMessage(email, "Reset Password Email", "Hi, User.... This is your otp "+otp);
         return ResponseEntity.status(200).body("Reset Pin Send Successfully");
+    }
+
+    @PostMapping("/otp-verification")
+    public ResponseEntity<String> otpVerification(@RequestBody ForgetPassword forgetPassword){
+
+        ForgetPassword data = forgetPasswordRepo.findByEmailAndOtp(forgetPassword.getEmail(), forgetPassword.getOtp());
+        if(data == null){
+            return ResponseEntity.status(403).body("OTP Not Found");
+        }
+        return ResponseEntity.status(200).body("OTP Verified");
     }
 }
