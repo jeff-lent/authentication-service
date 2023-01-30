@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.xloop.resourceloop.authenticationservice.Classes.Auth;
+import com.xloop.resourceloop.authenticationservice.Classes.ChangePassword;
 import com.xloop.resourceloop.authenticationservice.Classes.OTPGeneration;
 import com.xloop.resourceloop.authenticationservice.JPARepository.ForgetPasswordRepository;
 import com.xloop.resourceloop.authenticationservice.JPARepository.UserRepository;
@@ -67,34 +68,36 @@ public class AuthController {
         return ResponseEntity.status(403).body(null);
     }
 
-    @PostMapping("/forgetpassword/{id}")
-    public ResponseEntity<String> resetPassword(@PathVariable Long id ,@RequestBody String new_password){
-        User user = userRepo.findById(id).orElse(null);
-        user.setPassword(new_password);
+    @PostMapping("/forgetpassword")
+    public ResponseEntity<String> resetPassword(@RequestBody ChangePassword changePassword){
+        User user = userRepo.findByEmail(changePassword.getEmail());
+        String encodedPassword = bCryptPasswordEncoder.encode(changePassword.getPassword());
+        user.setPassword(encodedPassword);
         userRepo.save(user);
         return ResponseEntity.status(200).body("Password Updated Successfully");
     }
     
     @PostMapping("/forgetpassword-link")
-    public ResponseEntity<String> resetPasswordLink(@RequestBody String email){
-        User user = userRepo.findByEmail(email);
+    public ResponseEntity<String> resetPasswordLink(@RequestBody ForgetPassword data){
+        User user = userRepo.findByEmail(data.getEmail());
         if(user == null){
             return ResponseEntity.status(403).body("Email Not Found");
         }
         String otp = OTPGeneration.OTP(4);
-        ForgetPassword forgetPassword = new ForgetPassword(email,otp);
+        ForgetPassword forgetPassword = new ForgetPassword(data.getEmail(),otp);
         forgetPasswordRepo.save(forgetPassword);
-        emailService.sendSimpleMessage(email, "Reset Password Email", "Hi, User.... This is your otp "+otp);
+        emailService.sendSimpleMessage(data.getEmail(), "Reset Password Email", "Hi, User.... This is your otp "+otp);
         return ResponseEntity.status(200).body("Reset Pin Send Successfully");
     }
 
     @PostMapping("/otp-verification")
-    public ResponseEntity<String> otpVerification(@RequestBody ForgetPassword forgetPassword){
+    public ResponseEntity<User> otpVerification(@RequestBody ForgetPassword forgetPassword){
 
         ForgetPassword data = forgetPasswordRepo.findByEmailAndOtp(forgetPassword.getEmail(), forgetPassword.getOtp());
         if(data == null){
-            return ResponseEntity.status(403).body("OTP Not Found");
+            return ResponseEntity.status(403).body(null);
         }
-        return ResponseEntity.status(200).body("OTP Verified");
+        User user = userRepo.findByEmail(forgetPassword.getEmail());
+        return ResponseEntity.status(200).body(user);
     }
 }
