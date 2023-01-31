@@ -1,12 +1,12 @@
 package com.xloop.resourceloop.authenticationservice.Controller;
 
 import java.security.SecureRandom;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -84,7 +84,7 @@ public class AuthController {
             return ResponseEntity.status(403).body("Email Not Found");
         }
         String otp = OTPGeneration.OTP(4);
-        ForgetPassword forgetPassword = new ForgetPassword(data.getEmail(),otp);
+        ForgetPassword forgetPassword = new ForgetPassword(data.getEmail(),otp,false);
         forgetPasswordRepo.save(forgetPassword);
         emailService.sendSimpleMessage(data.getEmail(), "Reset Password Email", "Hi, User.... This is your otp "+otp);
         return ResponseEntity.status(200).body("Reset Pin Send Successfully");
@@ -97,7 +97,23 @@ public class AuthController {
         if(data == null){
             return ResponseEntity.status(403).body(null);
         }
+        if(data.getIs_expire()){
+            return ResponseEntity.status(401).body(null);
+        }
         User user = userRepo.findByEmail(forgetPassword.getEmail());
         return ResponseEntity.status(200).body(user);
+    }
+
+    @PostMapping("/otp-expire")
+    public ResponseEntity<String> otpExpire(@RequestBody ForgetPassword forgetPassword){
+        List<ForgetPassword> data = forgetPasswordRepo.findByEmail(forgetPassword.getEmail());
+        if(data == null){
+            return ResponseEntity.status(403).body("Email Not Found");
+        }
+        data.forEach(item-> {
+            item.setIs_expire(true);
+            forgetPasswordRepo.save(item);
+        });
+        return ResponseEntity.status(200).body("OTP Expired");
     }
 }

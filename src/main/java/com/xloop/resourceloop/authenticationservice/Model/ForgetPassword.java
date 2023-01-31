@@ -16,13 +16,16 @@ public class ForgetPassword {
     private String email;
     @Setter
     private String otp;
+    @Setter
+    private Boolean is_expire;
 
     public ForgetPassword(){
 
     }
-    public ForgetPassword(String email, String otp){
+    public ForgetPassword(String email, String otp,Boolean is_expire){
         this.email = email;
         this.otp = otp;
+        this.is_expire = is_expire;
     }
 
 }
