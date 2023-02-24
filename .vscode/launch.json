@@ -2,6 +2,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch OTPGeneration",
+            "request": "launch",
+            "mainClass": "com.xloop.resourceloop.authenticationservice.mail.OTPGeneration",
+            "projectName": "authentication-service"
+        },
+        {
+            "type": "java",
+            "name": "Launch EmailApplicationDemo",
+            "request": "launch",
+            "mainClass": "com.xloop.resourceloop.authenticationservice.mail.EmailApplicationDemo",
+            "projectName": "authentication-service"
+        },
+        {
+            "type": "java",
             "name": "Spring Boot-AuthenticationServiceApplication<authentication-service>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
